@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+bin/
+etc/
+include/
+lib/
+share/
+pyvenv.cfg
+.DS_Store
