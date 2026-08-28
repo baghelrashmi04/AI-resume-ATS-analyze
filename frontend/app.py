@@ -1,8 +1,9 @@
 
 import streamlit as st 
 import requests
+import os
 
-
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000")
 st.title("YOUR RESUME ANALYSER")
 st.write("Upload your resume and JD to get a ATS score & improved bullet points.")
 resume_file= st.file_uploader("Uplaod your resume", type=["pdf","docx"])
@@ -16,7 +17,7 @@ if st.button("Analyzer"):
             files={"resume":(resume_file.name,resume_file.getvalue())}
             data={"jd_text": jd_text}
             
-            response= requests.post("http://backend-container:8000/analyze",files=files,data=data)
+            response= requests.post(f"{BACKEND_URL}/analyze",files=files,data=data)
             
             
             if response.status_code==200:
