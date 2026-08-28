@@ -52,12 +52,15 @@ def generated_improved_bullets(missing_keywords: list[str],experience_text: str)
     )
     
     #making the api call 
-    response=client.models.generate_content(
-        model="gemini-3.6-flash",
-        contents= formatted_prompt,
-        config=types.GenerateContentConfig(temperature=0.3)
-    )
-    return response.text
+    try:
+        response=client.models.generate_content(
+            model="gemini-3.6-flash",
+            contents= formatted_prompt,
+            config=types.GenerateContentConfig(temperature=0.3)
+        )
+        return response.text
+    except Exception as e:
+        return "The AI rewriting service is temporarily unavailable. Please try again in a moment."
 if __name__=="__main__":
     from scoring import compute_ats_score
     from keywords import jd_keywords
