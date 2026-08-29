@@ -1,7 +1,11 @@
 
+# this file comapres resume against Job description
+
 from preprocess import normalise_text
 #from  test_preprocess import resume_text 
 
+
+# this function returns score percentage m matched keywords and missed keywords 
 
 def compute_ats_score(jd_keywords: list[str],resume_text: str) ->dict:
     normalised_resume = normalise_text(resume_text)

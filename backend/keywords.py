@@ -1,4 +1,7 @@
 
+# this file extracts keywords and skills to match with job description
+
+
 from extract import extract_pdf , extract_docx
 from preprocess import normalise_text, split_into_sections
 import spacy
@@ -18,6 +21,9 @@ generic_junk={
     "required skills"
 }
 
+
+# this functions gives clean words out of messy chunks which further hepls into identifying keywords 
+
 def clean_phrase(phrase:str) ->str:
     parts= re.split(r'[•\n]',phrase)
     cleaned=[]
@@ -26,6 +32,10 @@ def clean_phrase(phrase:str) ->str:
         if len(part) >= mini_key and part not in generic_junk:
             cleaned.append(part)
     return cleaned
+
+
+# this function runs spaCy noun-chunks/entity extraction and returnes a clean sorted keyword list
+
 def extract_keywords(jd_text:str) ->list[str]:      
     doc= nlp(jd_text)
     keywords=set()
@@ -46,6 +56,11 @@ def extract_keywords(jd_text:str) ->list[str]:
             #keywords.add(ent.text.strip().lower())
             
     return sorted(keywords)    
+
+
+
+
+
 if __name__=="__main__":
   with open("note.txt","r",encoding="utf-8") as f:
     jd_text=f.read()

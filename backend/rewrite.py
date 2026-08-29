@@ -1,4 +1,11 @@
 
+
+# this file holds functions everything related to ai powered bullets , 
+# the section of the product which is responisble for ai content
+
+
+
+
 import os 
 from google import genai
 from google.genai import types
@@ -10,7 +17,8 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 REWRITE_PROMPT = """
 You are an expert ATS (Application Tracking system) friendly resume writer.
 YOUR GOAL:
-Rewrite and improve the resume bullet points to naturally incorporate missing targeted keywords by following Google's formula ("Accomplished[x], measured by [y], by doing [z]").
+Rewrite and improve the resume bullet points to naturally incorporate missing targeted keywords by 
+following Google's formula ("Accomplished[x], measured by [y], by doing [z]").
 
 INPUT DATA:
 -target job keywords to include : {missing_keywords}
@@ -18,7 +26,9 @@ INPUT DATA:
 {experience_text}
 
 RULES & CONSTRAINTS:
--preserve truthfullness ; Only include metrics/numbers if they are explicitly present in the original bullet or can be reasonably inferred from it — never invent numbers, percentages, or scale that aren't implied by the source text
+-preserve truthfullness ; Only include metrics/numbers if they are explicitly present in the original 
+bullet or can be reasonably inferred from it — never invent numbers, percentages, or scale that aren't 
+implied by the source text
 
 - start every bullet point with a strong action verb(e.g, "Architectured","Optimised","Engineered").
 -If a bullet point is too vague or generic to honestly rewrite with specific 
@@ -33,7 +43,8 @@ RULES & CONSTRAINTS:
 - Never invent skills, tools, or achievements not implied by the original bullet
 
 OUTPUT FORMAT:
-provide the response in clear , bulleted markdwon format. After the bullets, add a brief 1-sentence note explaining how the missing keywords were integrated
+provide the response in clear , bulleted markdwon format. After the bullets, add a brief 1-sentence note 
+explaining how the missing keywords were integrated
  
 Return only rewritten points nothing else
 """
@@ -61,6 +72,55 @@ def generated_improved_bullets(missing_keywords: list[str],experience_text: str)
         return response.text
     except Exception as e:
         return "The AI rewriting service is temporarily unavailable. Please try again in a moment."
+    
+    
+def is_bullet_too_vague(bullet: str) ->bool:
+    """
+       checks if a bullet point is too vague to rewrite with specifics.
+    """
+    vague_phrases=[
+        "responsible for","various tasks","assisted with","helped with",
+        "worked on","involved in","participated in"
+    ]
+    bullet_lower=bullet.lower()
+    words=bullet.split()
+    word_count= len(words)
+    
+    if word_count <=10 or any(phrase in bullet_lower for phrase in vague_phrases):
+        return True
+        
+        
+    else:
+        return False
+            
+def split_into_bullets(text:str) ->list[str]:   # it splits paragrapgh or multiple lines into single lines
+    bullets=[line.strip() for line in text.splitlines() if line.strip()]
+    return bullets
+
+#this function separte the vague bullets from good bullets , vague bullets are flagged for user while 
+# good bullets goes to ai prompting
+
+def separate_vague_bullets(text: str) ->tuple:
+    bullets= split_into_bullets(text)
+    vague_bullets=[]
+    good_bullets=[]
+    for bullet in bullets:
+        if is_bullet_too_vague(bullet):
+            vague_bullets.append(bullet)
+        else:
+            good_bullets.append(bullet)
+    return vague_bullets,good_bullets
+    
+    
+
+
+    
+    
+    
+    
+    # for my knwledge just , this if dunder method is used to tell the interpreter that this 
+    # block of code must be used when it is called or imported 
+    
 if __name__=="__main__":
     from scoring import compute_ats_score
     from keywords import jd_keywords
