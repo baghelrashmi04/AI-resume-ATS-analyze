@@ -11,7 +11,7 @@ from extract import extract_pdf,extract_docx
 from  preprocess import normalise_text, split_into_sections
 from  keywords import extract_keywords
 from scoring import compute_ats_score
-from rewrite import generated_improved_bullets , separate_vague_bullets
+from rewrite import generated_improved_bullets , separate_vague_bullets, profile_summary_fit
 from ats import run_ats_safety_checks
 
 
@@ -44,12 +44,13 @@ async def analyse_resume(resume: UploadFile=File(...), jd_text:str=Form(...)):
     experience_text= sections.get("work experience") or sections.get("professional experience") or sections.get("project experience")  or sections.get("experience",resume_text) ## experience_text is a whole blob of text that is sent to gemini
     good_bullets,vague_bullets= separate_vague_bullets(experience_text)
     good_bullets_text="\n".join(good_bullets)
-
+    profile_summary = profile_summary_fit(jd_text, experience_text)
     improved_bullets= generated_improved_bullets(ats_result["missing_keywords"],good_bullets_text[:1500])
     return{
         "ats_score" : ats_result["score"],
         "matched_keywords": ats_result["matched_keywords"],
         "missing_keywords": ats_result["missing_keywords"],
+        "profile_summary": profile_summary,
         "improved_bullets": improved_bullets,
         "vague_bullets": vague_bullets,
         "full_ats_check": recheck
